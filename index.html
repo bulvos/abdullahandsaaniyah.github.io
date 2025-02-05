@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdullah & Saaniyah's Wedding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .landing {
+            height: 100vh;
+            background: url('/api/placeholder/1200/800') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .landing-content {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 10px;
+        }
+
+        .landing-content h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-decoration: none;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .rsvp-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .rsvp-container {
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #9c8164;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #rsvp-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            display: none;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <section class="landing">
+        <div class="landing-content">
+            <h1>Abdullah & Saaniyah</h1>
+            <p>Join us in celebrating our special day</p>
+            <p>July 15, 2025</p>
+        </div>
+        <a href="#rsvp" class="scroll-down">Scroll down to RSVP ↓</a>
+    </section>
+
+    <section id="rsvp" class="rsvp-section">
+        <div class="rsvp-container">
+            <h2>RSVP</h2>
+            <div class="form-group">
+                <label for="guest-name">Enter your name to find your invitation:</label>
+                <input type="text" id="guest-name" placeholder="Your name">
+            </div>
+            <button onclick="findInvitation()">Find My Invitation</button>
+
+            <div id="rsvp-details">
+                <div class="form-group">
+                    <label>Select Events:</label>
+                    <div id="events-checkboxes"></div>
+                </div>
+                <div class="form-group">
+                    <label for="guest-count">Number of Guests:</label>
+                    <input type="number" id="guest-count" min="1">
+                </div>
+                <button onclick="submitRSVP()">Submit RSVP</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Sample guest list - Replace with your actual guest list
+        const guestList = {
+            "John Doe": {
+                maxGuests: 2,
+                events: ["Nikah", "Reception"]
+            },
+            "Jane Smith": {
+                maxGuests: 4,
+                events: ["Reception"]
+            }
+        };
+
+        function findInvitation() {
+            const guestName = document.getElementById('guest-name').value;
+            const guestInfo = guestList[guestName];
+            const rsvpDetails = document.getElementById('rsvp-details');
+            const eventsCheckboxes = document.getElementById('events-checkboxes');
+            
+            if (guestInfo) {
+                rsvpDetails.style.display = 'block';
+                eventsCheckboxes.innerHTML = '';
+                
+                guestInfo.events.forEach(event => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-group';
+                    div.innerHTML = `
+                        <input type="checkbox" id="${event}" name="events" value="${event}">
+                        <label for="${event}">${event}</label>
+                    `;
+                    eventsCheckboxes.appendChild(div);
+                });
+                
+                const guestCount = document.getElementById('guest-count');
+                guestCount.max = guestInfo.maxGuests;
+                guestCount.value = 1;
+            } else {
+                alert('Guest not found. Please check the spelling or contact the hosts.');
+                rsvpDetails.style.display = 'none';
+            }
+        }
+
+        function submitRSVP() {
+            const guestName = document.getElementById('guest-name').value;
+            const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
+                .map(checkbox => checkbox.value);
+            const guestCount = document.getElementById('guest-count').value;
+            
+            // In production, this would send data to your server
+            const rsvpData = {
+                guestName,
+                selectedEvents,
+                guestCount
+            };
+            
+            console.log('RSVP Data:', rsvpData);
+            alert('Thank you for your RSVP!');
+        }
+    </script>
+</body>
+</html>
