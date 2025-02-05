@@ -289,34 +289,41 @@
             }
         });
 
-        function findInvitation() {
-            const guestName = document.getElementById('guest-name').value;
-            const guestInfo = guestList[guestName];
-            const rsvpDetails = document.getElementById('rsvp-details');
-            const eventsCheckboxes = document.getElementById('events-checkboxes');
+ function findInvitation() {
+    const guestName = document.getElementById('guest-name').value;
+    const guestInfo = guestList[guestName];
+    const rsvpDetails = document.getElementById('rsvp-details');
+    const eventsCheckboxes = document.getElementById('events-checkboxes');
+    const guestCountDropdown = document.getElementById('guest-count');
 
-            if (guestInfo) {
-                rsvpDetails.style.display = 'block';
-                eventsCheckboxes.innerHTML = '';
+    if (guestInfo) {
+        rsvpDetails.style.display = 'block';
+        eventsCheckboxes.innerHTML = '';
 
-                guestInfo.events.forEach(event => {
-                    const div = document.createElement('div');
-                    div.className = 'checkbox-group';
-                    div.innerHTML = `
-                        <input type="checkbox" id="${event}" name="events" value="${event}">
-                        <label for="${event}">${event}</label>
-                    `;
-                    eventsCheckboxes.appendChild(div);
-                });
+        // Populate events checkboxes
+        guestInfo.events.forEach(event => {
+            const div = document.createElement('div');
+            div.className = 'checkbox-group';
+            div.innerHTML = `
+                <input type="checkbox" id="${event}" name="events" value="${event}">
+                <label for="${event}">${event}</label>
+            `;
+            eventsCheckboxes.appendChild(div);
+        });
 
-                const guestCount = document.getElementById('guest-count');
-                guestCount.max = guestInfo.maxGuests;
-                guestCount.value = 1;
-            } else {
-                alert('Guest not found. Please check the spelling or contact the hosts.');
-                rsvpDetails.style.display = 'none';
-            }
+        // Populate guest count dropdown
+        guestCountDropdown.innerHTML = ''; // Clear existing options
+        for (let i = 1; i <= guestInfo.maxGuests; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            guestCountDropdown.appendChild(option);
         }
+    } else {
+        alert('Guest not found. Please check the spelling or contact the hosts.');
+        rsvpDetails.style.display = 'none';
+    }
+}
 
         function submitRSVP() {
             const guestName = document.getElementById('guest-name').value;
