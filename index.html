@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abdullah & Saaniyah's Wedding</title>
-    <!-- Add Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display&family=Lato&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Lato', sans-serif; /* Base font for regular text */
+            font-family: 'Parisienne', cursive;
             scroll-behavior: smooth;
         }
 
@@ -32,20 +30,9 @@
             border-radius: 10px;
         }
 
-        /* Cursive styling for main title */
         .landing-content h1 {
-            font-family: 'Great Vibes', cursive;
-            font-size: 4.5em;
+            font-size: 3em;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Elegant serif font for subtitles */
-        .landing-content p {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
         }
 
         .scroll-down {
@@ -56,7 +43,6 @@
             color: white;
             text-decoration: none;
             animation: bounce 2s infinite;
-            font-family: 'Playfair Display', serif;
         }
 
         @keyframes bounce {
@@ -89,15 +75,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Cursive styling for section titles */
-        h2 {
-            font-family: 'Great Vibes', cursive;
-            font-size: 3em;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
         .form-group {
             margin-bottom: 20px;
         }
@@ -107,7 +84,6 @@
             margin-bottom: 5px;
             font-weight: bold;
             color: #333;
-            font-family: 'Playfair Display', serif;
         }
 
         .form-group input {
@@ -115,7 +91,6 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-family: 'Lato', sans-serif;
         }
 
         button {
@@ -127,8 +102,6 @@
             cursor: pointer;
             width: 100%;
             font-size: 16px;
-            font-family: 'Playfair Display', serif;
-            letter-spacing: 1px;
         }
 
         button:hover {
@@ -144,7 +117,12 @@
 
         .checkbox-group {
             margin: 10px 0;
-            font-family: 'Lato', sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .loading {
@@ -152,9 +130,126 @@
             text-align: center;
             margin-top: 10px;
             color: #666;
-            font-family: 'Lato', sans-serif;
         }
     </style>
 </head>
-<!-- Rest of the HTML remains exactly the same -->
+<body>
+    <section class="landing">
+        <div class="landing-content">
+            <h1>Abdullah & Saaniyah</h1>
+            <p>Join us in celebrating our special day</p>
+            <p>July 15, 2025</p>
+        </div>
+        <a href="#rsvp" class="scroll-down">Scroll down to RSVP ↓</a>
+    </section>
+
+    <section id="rsvp" class="rsvp-section">
+        <div class="rsvp-container">
+            <h2>RSVP</h2>
+            <div class="form-group">
+                <label for="guest-name">Enter your name to find your invitation:</label>
+                <input type="text" id="guest-name" placeholder="Your name">
+            </div>
+            <button onclick="findInvitation()">Find My Invitation</button>
+
+            <div id="rsvp-details">
+                <div class="form-group">
+                    <label>Select Events:</label>
+                    <div id="events-checkboxes"></div>
+                </div>
+                <div class="form-group">
+                    <label for="guest-count">Number of Guests:</label>
+                    <input type="number" id="guest-count" min="1">
+                </div>
+                <button onclick="submitRSVP()">Submit RSVP</button>
+                <div id="loading" class="loading">Submitting your RSVP...</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Replace this with your Google Form URL
+        const GOOGLE_FORM_URL = 'YOUR_FORM_URL_HERE';
+        
+        // Replace this with your actual guest list
+        const guestList = {
+            "John Doe": {
+                maxGuests: 2,
+                events: ["Nikah", "Reception"]
+            },
+            "Jane Smith": {
+                maxGuests: 4,
+                events: ["Reception"]
+            }
+        };
+
+        function findInvitation() {
+            const guestName = document.getElementById('guest-name').value;
+            const guestInfo = guestList[guestName];
+            const rsvpDetails = document.getElementById('rsvp-details');
+            const eventsCheckboxes = document.getElementById('events-checkboxes');
+            
+            if (guestInfo) {
+                rsvpDetails.style.display = 'block';
+                eventsCheckboxes.innerHTML = '';
+                
+                guestInfo.events.forEach(event => {
+                    const div = document.createElement('div');
+                    div.className = 'checkbox-group';
+                    div.innerHTML = `
+                        <input type="checkbox" id="${event}" name="events" value="${event}">
+                        <label for="${event}">${event}</label>
+                    `;
+                    eventsCheckboxes.appendChild(div);
+                });
+                
+                const guestCount = document.getElementById('guest-count');
+                guestCount.max = guestInfo.maxGuests;
+                guestCount.value = 1;
+            } else {
+                alert('Guest not found. Please check the spelling or contact the hosts.');
+                rsvpDetails.style.display = 'none';
+            }
+        }
+
+        function submitRSVP() {
+            const guestName = document.getElementById('guest-name').value;
+            const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
+                .map(checkbox => checkbox.value).join(', ');
+            const guestCount = document.getElementById('guest-count').value;
+            
+            if (!selectedEvents) {
+                alert('Please select at least one event.');
+                return;
+            }
+
+            // Show loading message
+            document.getElementById('loading').style.display = 'block';
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('entry.1234567890', guestName);        // Replace with your actual form field IDs
+            formData.append('entry.0987654321', selectedEvents);   // Replace with your actual form field IDs
+            formData.append('entry.1111111111', guestCount);       // Replace with your actual form field IDs
+
+            // Submit to Google Form
+            fetch(GOOGLE_FORM_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            })
+            .then(() => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Thank you for your RSVP!');
+                document.getElementById('rsvp-details').style.display = 'none';
+                document.getElementById('guest-name').value = '';
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                alert('There was an error submitting your RSVP. Please try again.');
+                console.error(error);
+            });
+        }
+    </script>
+</body>
 </html>
