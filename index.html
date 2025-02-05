@@ -131,6 +131,38 @@
             margin-top: 10px;
             color: #666;
         }
+
+        #countdown {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        #timer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #timer span {
+            font-weight: bold;
+            color: #9c8164;
+        }
+
+        #guest-suggestions {
+            margin-top: 10px;
+            color: #666;
+        }
+
+        #guest-suggestions div {
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #guest-suggestions div:hover {
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
@@ -140,6 +172,15 @@
             <h1>Abdullah & Saaniyah</h1>
             <p>Join us in celebrating our special day</p>
             <p>July 15, 2025</p>
+            <div id="countdown">
+                <p>Countdown to the Big Day:</p>
+                <div id="timer">
+                    <span id="days"></span> Days
+                    <span id="hours"></span> Hours
+                    <span id="minutes"></span> Minutes
+                    <span id="seconds"></span> Seconds
+                </div>
+            </div>
         </div>
         <a href="#rsvp" class="scroll-down">Scroll down to RSVP ↓</a>
     </section>
@@ -150,6 +191,7 @@
             <div class="form-group">
                 <label for="guest-name">Enter your name to find your invitation:</label>
                 <input type="text" id="guest-name" placeholder="Your name">
+                <div id="guest-suggestions"></div>
             </div>
             <button onclick="findInvitation()">Find My Invitation</button>
 
@@ -168,10 +210,11 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         // Replace this with your Google Form URL
         const GOOGLE_FORM_URL = 'YOUR_FORM_URL_HERE';
-        
+
         // Replace this with your actual guest list
         const guestList = {
             "John Doe": {
@@ -181,19 +224,72 @@
             "Jane Smith": {
                 maxGuests: 4,
                 events: ["Reception"]
+            },
+            "Alice Johnson": {
+                maxGuests: 3,
+                events: ["Nikah"]
             }
         };
+
+        // Countdown Timer
+        const weddingDate = new Date('July 15, 2025 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const timeLeft = weddingDate - now;
+
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days;
+            document.getElementById('hours').innerText = hours;
+            document.getElementById('minutes').innerText = minutes;
+            document.getElementById('seconds').innerText = seconds;
+
+            if (timeLeft < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('timer').innerHTML = "The wedding has begun!";
+            }
+        }
+
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Fuzzy Search for Guest Names
+        const guestNameInput = document.getElementById('guest-name');
+        const guestSuggestions = document.getElementById('guest-suggestions');
+
+        guestNameInput.addEventListener('input', () => {
+            const input = guestNameInput.value.toLowerCase();
+            guestSuggestions.innerHTML = '';
+
+            if (input.length > 0) {
+                const matches = Object.keys(guestList).filter(name => name.toLowerCase().includes(input));
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    div.innerText = match;
+                    div.onclick = () => {
+                        guestNameInput.value = match;
+                        guestSuggestions.innerHTML = '';
+                        findInvitation();
+                    };
+                    guestSuggestions.appendChild(div);
+                });
+            }
+        });
 
         function findInvitation() {
             const guestName = document.getElementById('guest-name').value;
             const guestInfo = guestList[guestName];
             const rsvpDetails = document.getElementById('rsvp-details');
             const eventsCheckboxes = document.getElementById('events-checkboxes');
-            
+
             if (guestInfo) {
                 rsvpDetails.style.display = 'block';
                 eventsCheckboxes.innerHTML = '';
-                
+
                 guestInfo.events.forEach(event => {
                     const div = document.createElement('div');
                     div.className = 'checkbox-group';
@@ -203,7 +299,7 @@
                     `;
                     eventsCheckboxes.appendChild(div);
                 });
-                
+
                 const guestCount = document.getElementById('guest-count');
                 guestCount.max = guestInfo.maxGuests;
                 guestCount.value = 1;
@@ -218,15 +314,21 @@
             const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
                 .map(checkbox => checkbox.value).join(', ');
             const guestCount = document.getElementById('guest-count').value;
-            
+            const guestInfo = guestList[guestName];
+
             if (!selectedEvents) {
                 alert('Please select at least one event.');
                 return;
             }
 
+            if (guestCount > guestInfo.maxGuests) {
+                alert(`You can only bring up to ${guestInfo.maxGuests} guests.`);
+                return;
+            }
+
             // Show loading message
             document.getElementById('loading').style.display = 'block';
-            
+
             // Create form data
             const formData = new FormData();
             formData.append('entry.1234567890', guestName);        // Replace with your actual form field IDs
@@ -244,6 +346,11 @@
                 alert('Thank you for your RSVP!');
                 document.getElementById('rsvp-details').style.display = 'none';
                 document.getElementById('guest-name').value = '';
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
             })
             .catch(error => {
                 document.getElementById('loading').style.display = 'none';
