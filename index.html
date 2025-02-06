@@ -171,6 +171,12 @@
         #guest-suggestions div:hover {
             background-color: #f5f5f5;
         }
+        .event-details {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+    margin-left: 25px; /* Indent to align with the checkbox */
+}
     </style>
 </head>
 <body>
@@ -291,41 +297,45 @@
             }
         });
         function findInvitation() {
-            const guestName = document.getElementById('guest-name').value;
-            const guestInfo = guestList[guestName];
-            const rsvpDetails = document.getElementById('rsvp-details');
-            const eventsCheckboxes = document.getElementById('events-checkboxes');
-            const guestCountDropdown = document.getElementById('guest-count');
+    const guestName = document.getElementById('guest-name').value;
+    const guestInfo = guestList[guestName];
+    const rsvpDetails = document.getElementById('rsvp-details');
+    const eventsCheckboxes = document.getElementById('events-checkboxes');
+    const guestCountDropdown = document.getElementById('guest-count');
 
-            if (guestInfo) {
-                rsvpDetails.style.display = 'block';
-                eventsCheckboxes.innerHTML = '';
+    if (guestInfo) {
+        rsvpDetails.style.display = 'block';
+        eventsCheckboxes.innerHTML = '';
 
-                // Populate events checkboxes
-                guestInfo.events.forEach(event => {
-                    const div = document.createElement('div');
-                    div.className = 'checkbox-group';
-                    div.innerHTML = `
-                        <input type="checkbox" id="${event}" name="events" value="${event}">
-                        <label for="${event}">${event}</label>
-                    `;
-                    eventsCheckboxes.appendChild(div);
-                });
+        // Populate events checkboxes with details
+        guestInfo.events.forEach(event => {
+            const div = document.createElement('div');
+            div.className = 'checkbox-group';
+            div.innerHTML = `
+                <input type="checkbox" id="${event}" name="events" value="${event}">
+                <label for="${event}">${event}</label>
+                <p class="event-details">${eventDetails[event]}</p>
+            `;
+            eventsCheckboxes.appendChild(div);
+        });
 
-                // Populate guest count dropdown
-                guestCountDropdown.innerHTML = ''; // Clear existing options
-                for (let i = 1; i <= guestInfo.maxGuests; i++) {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = i;
-                    guestCountDropdown.appendChild(option);
-                }
-            } else {
-                alert('Guest not found. Please check the spelling or contact the hosts.');
-                rsvpDetails.style.display = 'none';
-            }
+        // Populate guest count dropdown
+        guestCountDropdown.innerHTML = ''; // Clear existing options
+        for (let i = 1; i <= guestInfo.maxGuests; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            guestCountDropdown.appendChild(option);
         }
-
+    } else {
+        alert('Guest not found. Please check the spelling or contact the hosts.');
+        rsvpDetails.style.display = 'none';
+    }
+}
+        const eventDetails = {
+    "Nikah": "Date: June 21, 2025 | Time: 10:00 AM | Location: Masjid Al-Huda",
+    "Reception": "Date: June 22, 2025 | Time: 7:00 PM | Location: Shalimar"
+};
         function submitRSVP() {
             const guestName = document.getElementById('guest-name').value;
             const selectedEvents = Array.from(document.querySelectorAll('input[name="events"]:checked'))
