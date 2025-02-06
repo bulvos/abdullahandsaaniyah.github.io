@@ -366,7 +366,6 @@
             // Submit to Google Form
             fetch(GOOGLE_FORM_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 body: formData
             })
             .then(() => {
